@@ -1,44 +1,159 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cartão daki RA</title>
 
-    <!-- Biblioteca que desenha os objectos 3D no navegador--> 
+    <!-- Biblioteca que desenha os objectos 3D no navegador-->
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe-v1.5.0.min.js"></script>
 
-    <!-- Biblioteca que reconhece o card daki personalizado ou não, na img da camera--> 
+    <!-- Biblioteca que reconhece o card daki personalizado ou não, na img da camera-->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
         /*retira as margens, para a camara ocupar o ecrã inteiro */
-        body {margin: 0;} 
+        body {
+            margin: 0;
+        }
+
+        /*Aviso de estado no canto superior esquerdo*/
+        #estado {
+            /*fixo no ecrã, por cima da câmera*/
+            position: fixed;
+            /*distância ao topo e a esquerda*/
+            top: 16px;
+            left: 16px;
+            /*fica a freente da img da câmara*/
+            z-index: 10;
+            padding: 8px 14px;
+            border-radius: 99px;
+            /*fundo preto semitransparente*/
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            /*letras do sistema*/
+            font-family: system-ui, sans-serif;
+        }
+
+
+        /*Barra dos botões no fundo do ecrã*/
+        #menu {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            right: 16px;
+            /*escondida por default, só aparece quando o cartão é reconhecido*/
+            display: none;
+            z-index: 10;
+            gap: 8px;
+        }
+
+        /*Aspecto de cada btn*/
+        #menu button {
+            /*botões com larguras iguais*/
+            flex: 1;
+            /*menos espaço lateral, para caberem quatro btns no ecrã do telemóvel*/
+            padding: 12x 4px;
+            border: 0;
+            border-radius: 12px;
+            /*laranja do cartão daki*/
+            background: #f2731f;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
-    <!-- targets.mind: abre o RA e indica o ficheiro do marcador--> 
-    <!-- color-space e renderer: cores fies às originais--> 
-    <!-- vr-mode-ui, xr-mode-ui: escondem o botão de entrada no modo imersivo (realidade virtual/estendida), desnecessário porque o MindAR faz a RA na própria page--> 
-    <!-- device-orientation-permission-ui: esconde o pedido de acesso ao sensor de orientação, que não usamos--> 
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind"
-    color-space="sRGB" renderer="colorManagement: true" 
-    vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-   
+    <!-- Aviso de estado: começa com "À procura do cartão"-->
+    <div id="estado">À procura do cartão...</div>~
 
-    <!-- Câmara virtual, fixa na posição da câmara do equipamento--> 
-    <!-- look-controls desligado para não rodar com o mouse--> 
-         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <!-- Barra de botões: escondida até o cartão ser reconhecido-->
+    <div id="menu">
+        <!-- Ao tocar, chama a função mostrar com o tema "atm"-->
+        <button onclick="mostrar('atm')">ATM</button>
+        <!-- Ao tocar, chama a função mostrar com o tema "pos"-->
+        <button onclick="mostrar('pos')">POS</button>
+        <!-- Ao tocar, chama a função mostrar com o tema "camp" (Campanhas)-->
+        <button onclick="mostrar('campanha')">Campanhas</button>
+        <!-- Ao tocar, chama a função mostrar com o tema "faq" (Sabias que)-->
+        <button onclick="mostrar('faq')">Sabias que</button>
 
-    <!-- Tudo o que estiver aqui dentro cola-se ao cartao. targetIndex 0 = primeira img do ficheiro target.mind--> 
-          <a-entity id="cartao" mindar-image-target="targetIndex: 0">
+        <!-- Texto ATM, acima do cartão (y = 0.5), escondido no inicio. O texto 3D do A-Frame não mostra acentos: escreve sem eles -->
+        <a-text id="texto-atm" value="ATM: insira o cartão e digite o PIN" position="0 0.5 0" align="center" width="2"
+            color="#ffffff" visible="false"></a-text>
 
-    <!-- Rectângulo laranja semitransparente sobre o cartão. largura 1 = largura do cartão; altura 0.63 = proporção do cartão--> 
-            <a-plane color="#0033ff" opacity="0.5" width="1" height="0.63"></a-plane>
+        <!-- Texto POS, na mesma posição, também escondido no inicio -->
+        <a-text id="texto-pos" value="POS: pague com PIN ou Contactless" position="0 0.5 0" align="center" width="2"
+            color="#ffffff" visible="false"></a-text>
 
-        </a-entity>
-    </a-scene>
-        
+        <!-- Texto das Campanhas, na mesma posição, também escondido no inicio -->
+        <a-text id="texto-camp" value="Campanhas: Adira ao eBanking com o seu cartão de débito" position="0 0.5 0"
+            align="center" width="2" color="#ffffff" visible="false"></a-text>
+
+        <!-- Texto do Sabias que, na mesma posição, também escondido no inicio -->
+        <a-text id="texto-faq" value="Sabias que pode bloquear o seu cartão no eBanking ou no Fala daki?"
+            position="0 0.5 0" align="center" width="2" color="#ffffff" visible="false"></a-text>
+
+
+        <!-- targets.mind: abre o RA e indica o ficheiro do marcador-->
+        <!-- color-space e renderer: cores fies às originais-->
+        <!-- vr-mode-ui, xr-mode-ui: escondem o botão de entrada no modo imersivo (realidade virtual/estendida), desnecessário porque o MindAR faz a RA na própria page-->
+        <!-- device-orientation-permission-ui: esconde o pedido de acesso ao sensor de orientação, que não usamos-->
+        <a-scene mindar-image="imageTargetSrc: ./targets.mind" color-space="sRGB" renderer="colorManagement: true"
+            vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+
+
+            <!-- Câmara virtual, fixa na posição da câmara do equipamento-->
+            <!-- look-controls desligado para não rodar com o mouse-->
+            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+            <!-- Tudo o que estiver aqui dentro cola-se ao cartao. targetIndex 0 = primeira img do ficheiro target.mind-->
+            <a-entity id="cartao" mindar-image-target="targetIndex: 0">
+
+                <!-- Rectângulo laranja semitransparente sobre o cartão. largura 1 = largura do cartão; altura 0.63 = proporção do cartão-->
+                <a-plane color="#0033ff" opacity="0.5" width="1" height="0.63"></a-plane>
+
+            </a-entity>
+        </a-scene>
+
+
+        <!-- Comportamento da página: eventos do cartão-->
+        <script>
+            // Guarda o estado do menu: se está ou não visível  
+            const cartao = document.querySelector("#cartao");
+
+            //Quando o MindAR reconhece o cartão...
+            cartao.addEventListener("targetFound", () => {
+                //...muda o aviso
+                document.querySelector("#estado").textContent = "Cartão reconhecido!";
+                //...e mostra a barra de botões
+                document.querySelector("#menu").style.display = "flex";
+            });
+
+            //Quando o cartão sai da câmera, avisa o utilizador (os botões continuam visiveis)...
+            cartao.addEventListener("targetLost", () => {
+                document.querySelector("#estado").textContent = "Cartão fora da câmara";
+            });
+
+            //Listas dos temas que existem na página                
+            const temas = ["atm", "pos", "campanha", "faq"];
+
+            //Função chamada pelos botões: recebe o tema escolhido
+            function mostrar(tema) {
+                //Percorre a lista: para no tema "t"
+                temas.forEach(t => {
+                    //Mostra o texto do tema correspondente só se "t" for igual a "tema", caso contrário esconde
+                    document.querySelector("#texto" + t).setAttribute("visible", t === tema);
+                });
+
+            }
+
+        </script>
+
+
 </body>
+
 </html>

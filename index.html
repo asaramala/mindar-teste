@@ -43,26 +43,28 @@
             bottom: 16px;
             left: 16px;
             right: 16px;
-            /*escondida por default, só aparece quando o cartão é reconhecido*/
             display: none;
+            /*escondida por default, só aparece quando o cartão é reconhecido*/
             z-index: 10;
+            /*permite passar para a linha seguinte se não couberem todos os botões*/
+            flex-wrap: wrap;
             gap: 6px;
         }
 
         /*Aspecto de cada btn*/
         #menu button {
-            /*botões com larguras iguais*/
-            flex: 1 1 0;
+            /*cada btn ocupa metade da largura: dois por linha*/
+            flex: 1 1 calc(50% - 8px);
             /*menos espaço lateral, para caberem quatro btns no ecrã do telemóvel*/
-            padding: 12x 4px;
-            min-width: 0;
+            padding: 14px 8px;
             border: 0;
             border-radius: 12px;
             /*laranja do cartão daki*/
             background: #f2731f;
             color: #fff;
-            font-size: 12px;
+            font-size: 16px;
             font-weight: 600;
+            /*texto numa só linha*/
             white-space: nowrap;
         }
     </style>

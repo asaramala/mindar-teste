@@ -41,20 +41,21 @@
         #menu {
             position: fixed;
             bottom: 16px;
-            left: 50%;
+            left: 16px;
             right: 16px;
             /*escondida por default, só aparece quando o cartão é reconhecido*/
             display: none;
             z-index: 10;
-            gap: 8px;
+            gap: 6px;
         }
 
         /*Aspecto de cada btn*/
         #menu button {
             /*botões com larguras iguais*/
-            flex: 1;
+            flex: 1 1 0;
             /*menos espaço lateral, para caberem quatro btns no ecrã do telemóvel*/
             padding: 12x 4px;
+            min-width: 0;
             border: 0;
             border-radius: 12px;
             /*laranja do cartão daki*/

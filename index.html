@@ -68,7 +68,7 @@
 
 <body>
     <!-- Aviso de estado: começa com "À procura do cartão"-->
-    <div id="estado">À procura do cartão...</div>~
+    <div id="estado">À procura do cartão...</div>
 
     <!-- Barra de botões: escondida até o cartão ser reconhecido-->
     <div id="menu">
@@ -80,7 +80,6 @@
         <button onclick="mostrar('campanha')">Campanhas</button>
         <!-- Ao tocar, chama a função mostrar com o tema "faq" (Sabias que)-->
         <button onclick="mostrar('faq')">Sabias que</button>
-
         <!-- Texto ATM, acima do cartão (y = 0.5), escondido no inicio. O texto 3D do A-Frame não mostra acentos: escreve sem eles -->
         <a-text id="texto-atm" value="ATM: insira o cartão e digite o PIN" position="0 0.5 0" align="center" width="2"
             color="#ffffff" visible="false"></a-text>
@@ -96,62 +95,62 @@
         <!-- Texto do Sabias que, na mesma posição, também escondido no inicio -->
         <a-text id="texto-faq" value="Sabias que pode bloquear o seu cartão no eBanking ou no Fala daki?"
             position="0 0.5 0" align="center" width="2" color="#ffffff" visible="false"></a-text>
+    </div>
+
+    <!-- targets.mind: abre o RA e indica o ficheiro do marcador-->
+    <!-- color-space e renderer: cores fies às originais-->
+    <!-- vr-mode-ui, xr-mode-ui: escondem o botão de entrada no modo imersivo (realidade virtual/estendida), desnecessário porque o MindAR faz a RA na própria page-->
+    <!-- device-orientation-permission-ui: esconde o pedido de acesso ao sensor de orientação, que não usamos-->
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind" color-space="sRGB" renderer="colorManagement: true"
+        vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
 
 
-        <!-- targets.mind: abre o RA e indica o ficheiro do marcador-->
-        <!-- color-space e renderer: cores fies às originais-->
-        <!-- vr-mode-ui, xr-mode-ui: escondem o botão de entrada no modo imersivo (realidade virtual/estendida), desnecessário porque o MindAR faz a RA na própria page-->
-        <!-- device-orientation-permission-ui: esconde o pedido de acesso ao sensor de orientação, que não usamos-->
-        <a-scene mindar-image="imageTargetSrc: ./targets.mind" color-space="sRGB" renderer="colorManagement: true"
-            vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        <!-- Câmara virtual, fixa na posição da câmara do equipamento-->
+        <!-- look-controls desligado para não rodar com o mouse-->
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <!-- Tudo o que estiver aqui dentro cola-se ao cartao. targetIndex 0 = primeira img do ficheiro target.mind-->
+        <a-entity id="cartao" mindar-image-target="targetIndex: 0">
+
+            <!-- Rectângulo laranja semitransparente sobre o cartão. largura 1 = largura do cartão; altura 0.63 = proporção do cartão-->
+            <a-plane color="#0033ff" opacity="0.5" width="1" height="0.63"></a-plane>
+
+        </a-entity>
+    </a-scene>
 
 
-            <!-- Câmara virtual, fixa na posição da câmara do equipamento-->
-            <!-- look-controls desligado para não rodar com o mouse-->
-            <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <!-- Comportamento da página: eventos do cartão-->
+    <script>
+        // Guarda o estado do menu: se está ou não visível  
+        const cartao = document.querySelector("#cartao");
 
-            <!-- Tudo o que estiver aqui dentro cola-se ao cartao. targetIndex 0 = primeira img do ficheiro target.mind-->
-            <a-entity id="cartao" mindar-image-target="targetIndex: 0">
+        //Quando o MindAR reconhece o cartão...
+        cartao.addEventListener("targetFound", () => {
+            //...muda o aviso
+            document.querySelector("#estado").textContent = "Cartão reconhecido!";
+            //...e mostra a barra de botões
+            document.querySelector("#menu").style.display = "flex";
+        });
 
-                <!-- Rectângulo laranja semitransparente sobre o cartão. largura 1 = largura do cartão; altura 0.63 = proporção do cartão-->
-                <a-plane color="#0033ff" opacity="0.5" width="1" height="0.63"></a-plane>
+        //Quando o cartão sai da câmera, avisa o utilizador (os botões continuam visíveis)...
+        cartao.addEventListener("targetLost", () => {
+            document.querySelector("#estado").textContent = "Cartão fora da câmara";
+        });
 
-            </a-entity>
-        </a-scene>
+        //Listas dos temas que existem na página                
+        const temas = ["atm", "pos", "camp", "faq"];
 
-
-        <!-- Comportamento da página: eventos do cartão-->
-        <script>
-            // Guarda o estado do menu: se está ou não visível  
-            const cartao = document.querySelector("#cartao");
-
-            //Quando o MindAR reconhece o cartão...
-            cartao.addEventListener("targetFound", () => {
-                //...muda o aviso
-                document.querySelector("#estado").textContent = "Cartão reconhecido!";
-                //...e mostra a barra de botões
-                document.querySelector("#menu").style.display = "flex";
+        //Função chamada pelos botões: recebe o tema escolhido
+        function mostrar(tema) {
+            //Percorre a lista: para no tema "t"
+            temas.forEach(t => {
+                //Mostra o texto do tema correspondente só se "t" for igual a "tema", caso contrário esconde
+                document.querySelector("#texto-" + t).setAttribute("visible", t === tema);
             });
 
-            //Quando o cartão sai da câmera, avisa o utilizador (os botões continuam visiveis)...
-            cartao.addEventListener("targetLost", () => {
-                document.querySelector("#estado").textContent = "Cartão fora da câmara";
-            });
+        }
 
-            //Listas dos temas que existem na página                
-            const temas = ["atm", "pos", "campanha", "faq"];
-
-            //Função chamada pelos botões: recebe o tema escolhido
-            function mostrar(tema) {
-                //Percorre a lista: para no tema "t"
-                temas.forEach(t => {
-                    //Mostra o texto do tema correspondente só se "t" for igual a "tema", caso contrário esconde
-                    document.querySelector("#texto" + t).setAttribute("visible", t === tema);
-                });
-
-            }
-
-        </script>
+    </script>
 
 
 </body>

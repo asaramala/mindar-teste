@@ -61,8 +61,9 @@
             /*laranja do cartão daki*/
             background: #f2731f;
             color: #fff;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -113,8 +114,23 @@
         <!-- Tudo o que estiver aqui dentro cola-se ao cartao. targetIndex 0 = primeira img do ficheiro target.mind-->
         <a-entity id="cartao" mindar-image-target="targetIndex: 0">
 
-            <!-- Rectângulo laranja semitransparente sobre o cartão. largura 1 = largura do cartão; altura 0.63 = proporção do cartão-->
-            <a-plane color="#0033ff" opacity="0.5" width="1" height="0.63"></a-plane>
+            <!-- Cantos laranja que delimitam o cartão.
+           Cada canto tem duas barras finas: uma horizontal e uma vertical.
+           O cartão mede 1 de largura e 0.63 de altura; os cantos ficam um pouco por fora (0.52 e 0.335) -->
+            <a-entity id="cantos">
+                <!-- Canto superior esquerdo: barra horizontal e barra vertical -->
+                <a-plane color="#f2731f" width="0.15" height="0.025" position="-0.445 0.335 0"></a-plane>
+                <a-plane color="#f2731f" width="0.025" height="0.15" position="-0.52 0.26 0"></a-plane>
+                <!-- Canto superior direito -->
+                <a-plane color="#f2731f" width="0.15" height="0.025" position="0.445 0.335 0"></a-plane>
+                <a-plane color="#f2731f" width="0.025" height="0.15" position="0.52 0.26 0"></a-plane>
+                <!-- Canto inferior esquerdo -->
+                <a-plane color="#f2731f" width="0.15" height="0.025" position="-0.445 -0.335 0"></a-plane>
+                <a-plane color="#f2731f" width="0.025" height="0.15" position="-0.52 -0.26 0"></a-plane>
+                <!-- Canto inferior direito -->
+                <a-plane color="#f2731f" width="0.15" height="0.025" position="0.445 -0.335 0"></a-plane>
+                <a-plane color="#f2731f" width="0.025" height="0.15" position="0.52 -0.26 0"></a-plane>
+            </a-entity>
 
         </a-entity>
     </a-scene>
